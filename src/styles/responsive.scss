@@ -1,0 +1,81 @@
+// 响应式工具类
+
+// 断点定义
+$breakpoint-xs: 480px;
+$breakpoint-sm: 768px;
+$breakpoint-md: 992px;
+$breakpoint-lg: 1200px;
+$breakpoint-xl: 1920px;
+
+// 移动端优先的响应式类
+.mobile-only {
+  display: block;
+  
+  @media (min-width: $breakpoint-sm) {
+    display: none;
+  }
+}
+
+.desktop-only {
+  display: none;
+  
+  @media (min-width: $breakpoint-sm) {
+    display: block;
+  }
+}
+
+// 响应式间距
+.responsive-padding {
+  padding: 20px;
+  
+  @media (max-width: $breakpoint-sm) {
+    padding: 10px;
+  }
+}
+
+.responsive-margin {
+  margin: 20px;
+  
+  @media (max-width: $breakpoint-sm) {
+    margin: 10px;
+  }
+}
+
+// 响应式文字大小
+.responsive-title {
+  font-size: 24px;
+  
+  @media (max-width: $breakpoint-sm) {
+    font-size: 18px;
+  }
+}
+
+// 响应式卡片
+.responsive-card {
+  :deep(.el-card__body) {
+    padding: 20px;
+    
+    @media (max-width: $breakpoint-sm) {
+      padding: 12px;
+    }
+  }
+}
+
+// 响应式表格
+.responsive-table {
+  :deep(.el-table) {
+    font-size: 14px;
+    
+    @media (max-width: $breakpoint-sm) {
+      font-size: 12px;
+    }
+    
+    // 移动端隐藏某些列
+    .mobile-hidden {
+      @media (max-width: $breakpoint-sm) {
+        display: none;
+      }
+    }
+  }
+}
+
