@@ -14,6 +14,7 @@
       <el-table v-loading="loading" :data="tableData" stripe class="responsive-table">
         <el-table-column prop="id" label="ID" width="80" class-name="mobile-hidden" />
         <el-table-column prop="name" label="业务线名称" min-width="150" />
+        <el-table-column prop="state" label="标识" min-width="150" class-name="mobile-hidden" />
         <el-table-column prop="description" label="描述" min-width="200" show-overflow-tooltip class-name="mobile-hidden" />
         <el-table-column prop="is_active" label="状态" width="100">
           <template #default="{ row }">
@@ -66,6 +67,17 @@
       <el-form ref="formRef" :model="formData" :rules="formRules" label-width="100px">
         <el-form-item label="业务线名称" prop="name">
           <el-input v-model="formData.name" placeholder="请输入业务线名称" clearable />
+        </el-form-item>
+        <el-form-item label="业务线标识" prop="state">
+          <el-input 
+            v-model="formData.state" 
+            placeholder="选填，留空则自动生成，如：support_community" 
+            clearable
+            :disabled="dialogMode === 'edit'"
+          />
+          <div style="color: #909399; font-size: 12px; margin-top: 4px;">
+            标识用于唯一识别业务线（可选，留空则后端自动生成），只能包含小写字母、数字、下划线和横线，长度3-50字符，创建后不可修改
+          </div>
         </el-form-item>
         <el-form-item label="描述" prop="description">
           <el-input
@@ -212,12 +224,20 @@ const submitting = ref(false)
 const formRef = ref<FormInstance>()
 const formData = reactive<Partial<BusinessLine>>({
   name: '',
+  state: '',
   description: '',
   is_active: true,
 })
 
 const formRules: FormRules = {
   name: [{ required: true, message: '请输入业务线名称', trigger: 'blur' }],
+  state: [
+    { 
+      pattern: /^[a-z0-9_-]{3,50}$/, 
+      message: '标识只能包含小写字母、数字、下划线和横线，长度3-50字符', 
+      trigger: 'blur' 
+    }
+  ],
 }
 
 // 群聊池管理相关
@@ -324,7 +344,17 @@ async function handleSubmit() {
     submitting.value = true
     try {
       if (dialogMode.value === 'create') {
-        await businessLinesAPI.create(formData)
+        // 创建时，如果state为空，就不传这个字段（让后端自动生成）
+        const submitData: any = {
+          name: formData.name,
+          description: formData.description,
+          is_active: formData.is_active,
+        }
+        // 只有当state有值时才传递
+        if (formData.state && formData.state.trim()) {
+          submitData.state = formData.state.trim()
+        }
+        await businessLinesAPI.create(submitData)
         ElMessage.success('创建成功')
       } else {
         await businessLinesAPI.update(formData.id!, formData)
@@ -347,6 +377,7 @@ function handleDialogClose() {
 function resetForm() {
   formData.id = undefined
   formData.name = ''
+  formData.state = ''
   formData.description = ''
   formData.is_active = true
   businessLineGroups.value = []

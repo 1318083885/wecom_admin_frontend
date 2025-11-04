@@ -7,6 +7,7 @@ export type { ReferrerConfig, CreateReferrerRequest, UpdateReferrerRequest } fro
 export interface BusinessLine {
   id: number
   name: string
+  state?: string // 可选，不传则后端自动生成
   description?: string
   is_active: boolean
   created_at: string
